@@ -56,21 +56,35 @@ while isRunnig:
     if keys[K_RIGHT]:
         faceModel.rotation.y += 40 * deltaTime
 
-    # camera
+    if keys[K_UP]:
+        rend.pointlight.z -= 1 * deltaTime
+
+    if keys[K_DOWN]:
+        rend.pointlight.z -= 1 * deltaTime
+
+    if keys[K_PAGEUP]:
+        rend.pointlight.z -= 1 * deltaTime
+
+    if keys[K_PAGEDOWN]:
+        rend.pointlight.z -= 1 * deltaTime
+
+
+
     if keys[K_a]:
-        rend.camera.position.x -= 1 * deltaTime  # 1m/s
+        camAngle -=45 * deltaTime
 
     if keys[K_d]:
-        rend.camera.position.x += 1 * deltaTime  # 1m/s
+        camAngle +=45 * deltaTime
 
     if keys[K_w]:
-        rend.camera.position.y += 1 * deltaTime  # 1m/s
+        camAngle -= 2 * deltaTime
 
     if keys[K_s]:
         rend.camera.position.y -= 1 * deltaTime  # 1m/s
 
 
     rend.camera.LookAt(faceModel.translation)
+    rend.camera.Orbit(faceModel.translation, camDistance, camAngle)
 
     rend.Render()
 

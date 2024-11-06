@@ -1,5 +1,5 @@
 import glm
-
+from math import sin, cos, radians
 
 class Camera(object):
     def __init__(self, width, height):
@@ -35,3 +35,7 @@ class Camera(object):
         viewMatrix = glm.lookAt(self.position, center, glm.vec3(0,1,0))
         camMatrix = glm.inverse(viewMatrix)
         self.rotation = glm.degrees(glm.eulerAngles(glm.quat_cast(camMatrix)))
+
+    def Orbit(self, center, distance, angle):
+        self.position.x = center.x + sin(radians(angle)) * distance
+        self.position.z = center.z + sin(radians(angle)) * distance
