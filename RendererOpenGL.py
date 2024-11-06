@@ -80,7 +80,11 @@ while isRunnig:
         camAngle -= 2 * deltaTime
 
     if keys[K_s]:
-        rend.camera.position.y -= 1 * deltaTime  # 1m/s
+        camAngle += 2 * deltaTime
+
+    #mouseButtons = pygame.mouse.get_pressed()
+    #if mouseButtons[0]:
+    #    camAngle += pygame.mouse.get_rel()[0] * deltaTime * 5
 
 
     rend.camera.LookAt(faceModel.translation)
