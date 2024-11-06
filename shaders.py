@@ -7,17 +7,91 @@ layout (location = 2) in vec3 normals;
 
 out vec2 outTexCoords;
 out vec3 outNormals;
+out vec4 outPosition;
 
-uniform  float time;
+uniform float time;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
+
 void main()
 {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+    outPosition = modelMatrix * vec4(position, 1.0);
+	gl_Position = projectionMatrix * viewMatrix * outPosition;
+
     outTexCoords = texCoords;
     outNormals = normals;
+}
+'''
+
+fat_shader = '''
+#version 450 core
+
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec2 texCoords;
+layout (location = 2) in vec3 normals;
+
+out vec2 outTexCoords;
+out vec3 outNormals;
+out vec4 outPosition;
+
+
+uniform float time;
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
+
+void main()
+{
+    outPosition = modelMatrix * vec4(position + normals * sin(time) / 10, 1.0);
+	gl_Position = projectionMatrix * viewMatrix * outPosition;
+    outTexCoords = texCoords;
+    outNormals = normals;
+}
+'''
+
+water_shader = '''
+#version 450 core
+
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec2 texCoords;
+layout (location = 2) in vec3 normals;
+
+out vec2 outTexCoords;
+out vec3 outNormals;
+out vec4 outPosition;
+
+uniform float time;
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
+
+void main()
+{
+    outPosition = modelMatrix * vec4(position + vec3(0,1,0) * sin(time * position.x * 10) /10, 1.0);
+	gl_Position = projectionMatrix * viewMatrix * outPosition;
+    outTexCoords = texCoords;
+    outNormals = normals;
+}
+'''
+
+skybox_vertex_shader = '''
+#version 450 core
+
+layout (location = 0) in vec3 inPosition;
+
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
+out vec3 texCoords;
+
+void main()
+{
+    texCoords = inPosition;
+    gl_Position = projectionMatrix * viewMatrix * vec4(inPosition, 1.0);
 }
 
 '''
@@ -27,63 +101,56 @@ fragment_shader = '''
 
 in vec2 outTexCoords;
 in vec3 outNormals;
+in vec4 outPosition;
+
 
 uniform sampler2D tex;
+uniform vec3 pointLight;
+
 
 out vec4 fragColor;
 
 void main()
 {
-    fragColor = texture(tex, outTexCoords);   
+    float intensity = dot(outNormals, normalize(pointLight - outPosition.xyz) );
+	fragColor = texture(tex, outTexCoords) * intensity;
 }
 '''
 
-enhanced  = '''
+negative_shader = '''
 #version 450 core
 
 in vec2 outTexCoords;
-in vec3 FragPos;
-in vec3 Normal;
-
-out vec4 fragColor;
+in vec3 outNormals;
+in vec4 outPosition;
 
 uniform sampler2D tex;
 
-uniform vec3 lightPos;    
-uniform vec3 viewPos;     
-uniform vec3 lightColor;  
-uniform vec3 objectColor; 
+
+out vec4 fragColor;
 
 void main()
 {
-    // Ambient lighting
-    float ambientStrength = 0.2;
-    vec3 ambient = ambientStrength * lightColor;
-
-    // Diffuse lighting
-    vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(lightPos - FragPos);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor;
-
-    // Specular lighting
-    float specularStrength = 0.5;
-    vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    // Phong specular model
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = specularStrength * spec * lightColor;
-
-    // Combine all lighting components
-    vec3 lighting = (ambient + diffuse + specular);
-
-    // Texture color
-    vec4 texColor = texture(tex, outTexCoords);
-
-    // Final color with lighting applied to the texture
-    fragColor = vec4(lighting, 1.0) * texColor;
+	fragColor = 1 - texture(tex, outTexCoords);
 }
 '''
+
+skybox_fragment_shader = '''
+#version 450 core
+
+uniform samplerCube skybox;
+
+in vec3 texCoords;
+
+out vec4 fragColor;
+
+void main()
+{
+    fragColor = texture(skybox, texCoords);
+}
+
+'''
+
 # Nuevos Shaders
 
 animated_vertex_shader = '''
