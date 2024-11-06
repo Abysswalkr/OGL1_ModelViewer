@@ -30,3 +30,8 @@ class Camera(object):
     def CreateProjectionMatrix(self, fov, nearPlane, farPlane):
         self.projectionMatrix = glm.perspective(glm.radians(fov), self.screenWidth / self.screenHeight, nearPlane,
                                                 farPlane)
+
+    def LookAt(self, center):
+        viewMatrix = glm.lookAt(self.position, center, glm.vec3(0,1,0))
+        camMatrix = glm.inverse(viewMatrix)
+        self.rotation = glm.degrees(glm.eulerAngles(glm.quat_cast(camMatrix)))

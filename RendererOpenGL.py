@@ -28,6 +28,9 @@ rend.scene.append(faceModel)
 
 isRunnig = True
 
+camDistance = 5
+camAngle = 0
+
 while isRunnig:
     deltaTime = clock.tick(60) / 1000
 
@@ -66,9 +69,12 @@ while isRunnig:
     if keys[K_s]:
         rend.camera.position.y -= 1 * deltaTime  # 1m/s
 
-    rend.time += deltaTime
+
+    rend.camera.LookAt(faceModel.translation)
 
     rend.Render()
+
+    rend.time +- deltaTime
     pygame.display.flip()
 
 pygame.quit()
