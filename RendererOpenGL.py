@@ -15,6 +15,10 @@ clock = pygame.time.Clock()
 
 rend = Renderer(screen)
 
+skyboxTextures = []
+
+rend.CreateSkybox(skyboxTextures, skybox_vertex_shader, skybox_fragment_shader)
+
 # Nuevos Shaders
 rend.SetShaders(scan_vertex_shader, scan_fragment_shader)
 
